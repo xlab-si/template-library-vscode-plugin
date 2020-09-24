@@ -1,8 +1,9 @@
-import { Uri, QuickPickItem, OpenDialogOptions, window, Disposable, QuickInputButton, QuickInput, ExtensionContext, QuickInputButtons, ThemeIcon, DebugConsoleMode } from 'vscode';
+import { window, QuickInputButton, ExtensionContext, ThemeIcon } from 'vscode';
 import * as fs from 'fs';
 
 import * as restApi from './rest-api-calls';
 import { MultiStepInput } from './helpers';
+import { CURRENT_DIR_PATH } from './extension';
 
 export async function downloadTemplateAction(context: ExtensionContext) {
 
@@ -170,11 +171,16 @@ export async function downloadTemplateAction(context: ExtensionContext) {
         //     shouldResume: shouldResume
         // });
 
+        let destinationPath = `./${state.templateName}`;
+        if (CURRENT_DIR_PATH) {
+            destinationPath = `${CURRENT_DIR_PATH}/${state.templateName}`;;
+        }
+
         let destinationFolderInput = await input.showInputBox({
             title: downloadTemplateTitle,
             step: 3,
             totalSteps: 3,
-            value: `./${state.templateName}` || '',
+            value: destinationPath || '',
             prompt: 'Type in a path where template version files will be downloaded to',
             buttons: [backButton],
             shouldResume: shouldResume,

@@ -1,10 +1,12 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 import { setApiEndpointAction } from './set-api-endpoint-action';
 import { uploadTemplateAction } from './upload-template-action';
 import { downloadTemplateAction } from './download-template-action';
 
 export let CURRENTLY_SELECTED_FILE: string;
+export let CURRENT_DIR_PATH: string;
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('template-library.actions', async (uri?: vscode.Uri) => {
@@ -17,6 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
 			} else {
 				vscode.window.showWarningMessage(`Selected file will not be included.`);
 			}
+			CURRENT_DIR_PATH = path.resolve(path.dirname(uri.fsPath));
 		}
 
 		const options: { [key: string]: (context: vscode.ExtensionContext) => Promise<void> } = {

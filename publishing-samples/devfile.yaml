@@ -1,0 +1,17 @@
+apiVersion: 1.0.0
+metadata:
+  generateName: radon-workspace-
+projects:
+  - name: radon-particles
+    source:
+      location: 'https://github.com/radon-h2020/radon-particles'
+      type: git
+components:
+  - id: eclipse/che-theia/next
+    type: cheEditor
+    alias: theia-editor
+  - type: chePlugin
+    # works only with manual intervention! for testing purposes only
+    reference: >-
+      https://template-library-radon.xlab.si/docs/_downloads/meta.yaml
+    alias: radon-template-library-plugin

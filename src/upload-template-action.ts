@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 import * as restApi from './rest-api-calls';
 import { MultiStepInput } from './helpers';
-import { CURRENTLY_SELECTED_FILE } from './extension';
+import { CURRENTLY_SELECTED_FILE, CURRENT_DIR_PATH } from './extension';
 
 export async function uploadTemplateAction(context: ExtensionContext) {
 
@@ -221,7 +221,7 @@ export async function uploadTemplateAction(context: ExtensionContext) {
             title: createTemplateTitle,
             step: 4,
             totalSteps: 4,
-            placeholder: 'Pick a resource group',
+            placeholder: 'Do you want your template to be publicly accessible?',
             items: publicAccessOptions,
             activeItem: publicAccessOptions[0],
             buttons: [backButton],
@@ -283,9 +283,14 @@ export async function uploadTemplateAction(context: ExtensionContext) {
         if (pick === pickReadmeFileOptions[0]) {
             state.readmeFile = undefined;
         } else if (pick === pickReadmeFileOptions[1]) {
+            let currentPath = `./`;
+            if (CURRENT_DIR_PATH) {
+                currentPath = CURRENT_DIR_PATH;
+            }
+
             const readmeFiles: string[] = [];
 
-            fs.readdirSync('./').forEach(file => {
+            fs.readdirSync(currentPath).forEach(file => {
                 let fileExtension = file.split('.').pop();
                 if (fileExtension === "md") {
                     readmeFiles.push(file);
@@ -353,9 +358,14 @@ export async function uploadTemplateAction(context: ExtensionContext) {
         }
 
         if (pick === pickTemplateFileOptions[0]) {
+            let currentPath = `./`;
+            if (CURRENT_DIR_PATH) {
+                currentPath = CURRENT_DIR_PATH;
+            }
+
             const templateFiles: string[] = [];
 
-            fs.readdirSync('./').forEach(file => {
+            fs.readdirSync(currentPath).forEach(file => {
                 if (state.templateTypeName === 'csar') {
                     let fileExtension = file.split('.').pop();
                     if (['csar', 'zip', 'tar', 'rar', 'gz', 'tgz'].includes(fileExtension!!)) {
@@ -451,9 +461,14 @@ export async function uploadTemplateAction(context: ExtensionContext) {
         if (pick === pickImplementationFileOptions[0]) {
             state.implementationFiles = undefined;
         } else if (pick === pickImplementationFileOptions[1]) {
+            let currentPath = `./`;
+            if (CURRENT_DIR_PATH) {
+                currentPath = CURRENT_DIR_PATH;
+            }
+
             const readmeFiles: string[] = [];
 
-            fs.readdirSync('./').forEach(file => {
+            fs.readdirSync(currentPath).forEach(file => {
                 let fileExtension = file.split('.').pop();
                 if (['csar', 'zip', 'tar', 'rar', 'gz', 'tgz', 'yml', 'yaml', 'tosca'].includes(fileExtension!!)) {
                     readmeFiles.push(file);

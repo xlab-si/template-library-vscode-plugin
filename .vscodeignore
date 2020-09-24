@@ -12,7 +12,7 @@ vsc-extension-quickstart.md
 
 # ignore files that get packaged by vsce package
 node_modules
-out/
+#out/
 src/
 tsconfig.json
 .venv/

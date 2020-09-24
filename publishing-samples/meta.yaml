@@ -1,0 +1,15 @@
+apiVersion: v2
+publisher: radon
+name: template-library-plugin
+version: 0.0.1
+type: VS Code extension
+displayName: template-library-plugin
+title: RADON Template Library Plugin
+description: Use Template Library directly from your IDE!
+icon: https://www.eclipse.org/che/images/logo-eclipseche.svg
+repository: https://github.com/radon-h2020/radon-template-library-publishing-service-plugin
+category: Other
+spec:
+  extensions:
+    # only works with manual intervention!
+    - https://template-library-radon.xlab.si/docs/_downloads/template-library-plugin-0.0.1.vsix

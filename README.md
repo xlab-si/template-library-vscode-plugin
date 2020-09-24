@@ -1,4 +1,4 @@
-# Template library (publishing service) plugin for RADON IDE
+# Template library plugin for RADON IDE
 This repository allows you to set up RADON IDE Template library plugin. To prevent any possible confusions 
 remember that Template library (service) or its parts may also be called TPS (Template Publishing Service) or 
 TLPS (Template Library Publishing Service).
