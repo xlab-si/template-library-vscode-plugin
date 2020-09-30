@@ -1,6 +1,8 @@
 // helper class was used from: https://github.com/microsoft/vscode-extension-samples/blob/master/quickinput-sample/src/multiStepInput.ts
 
-import { QuickPickItem, window, Disposable, QuickInputButton, QuickInput, QuickInputButtons } from 'vscode';
+import { QuickPickItem, window, Disposable, QuickInputButton, QuickInput, QuickInputButtons, ThemeIcon, ExtensionContext } from 'vscode';
+
+import * as restApi from './rest-api-calls';
 
 export class InputFlowAction {
     static back = new InputFlowAction();
@@ -178,4 +180,92 @@ export class MultiStepInput {
             disposables.forEach(d => d.dispose());
         }
     }
+}
+
+
+export async function authenticate(context: ExtensionContext) {
+
+    const loginTitle = 'Login to Template library';
+
+    class MyButton implements QuickInputButton {
+        constructor(public iconPath: ThemeIcon, public tooltip: string) { }
+    }
+
+    const backButton = new MyButton(new ThemeIcon("debug-reverse-continue"), 'Back');
+
+    async function collectInputs() {
+        let currentUserResponse = await restApi.getCurrentUser();
+
+        if (currentUserResponse && restApi.SUCCESSFULL_STATUS_CODES.includes(currentUserResponse.status) && currentUserResponse.data instanceof Object) {
+            window.showInformationMessage('Native or KeyCloak user was found!');
+            return;
+        } else {
+            if (currentUserResponse) {
+                window.showInformationMessage('You will need to login as a native user!');
+                await MultiStepInput.run(input => inputUsername(input));
+                return;
+            } else {
+                window.showErrorMessage('It looks like that Template library REST API is not accessible!');
+                return;
+            }
+        }
+    }
+
+    async function inputUsername(input: MultiStepInput): Promise<any> {
+        let username = await input.showInputBox({
+            title: loginTitle,
+            step: 1,
+            totalSteps: 2,
+            value: '',
+            prompt: 'Username',
+            validate: validateEmpty,
+            shouldResume: shouldResume
+        });
+
+        return (input: MultiStepInput) => inputPassword(input, username);
+    }
+
+    async function inputPassword(input: MultiStepInput, username: string): Promise<any> {
+        let password = await input.showInputBox({
+            title: loginTitle,
+            step: 2,
+            totalSteps: 2,
+            value: '',
+            prompt: 'Password',
+            buttons: [backButton],
+            validate: validateEmpty,
+            shouldResume: shouldResume
+        }, true);
+
+
+        if (password instanceof MyButton) {
+            return (input: MultiStepInput) => inputUsername(input);
+        }
+
+        let loginResponse = await restApi.postLogin(username, password);
+
+        if (loginResponse && restApi.SUCCESSFULL_STATUS_CODES.includes(loginResponse.status)) {
+            window.showInformationMessage('Login has been successful!');
+            return;
+        } else {
+            if (loginResponse) {
+                window.showErrorMessage(loginResponse.data);
+            } else {
+                window.showErrorMessage('Login has failed! Please try again.');
+            }
+            return (input: MultiStepInput) => inputUsername(input);
+        }
+    }
+
+    function shouldResume() {
+        return new Promise<boolean>((resolve, reject) => {
+        });
+    }
+
+    async function validateEmpty(value: string) {
+        return value === '' ? 'Emtpy value is not allowed' : undefined;
+    }
+
+    const state = await collectInputs();
+    window.showInformationMessage('Template library login action has finished.');
 }

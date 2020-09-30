@@ -11,28 +11,54 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:template-library.actions"
+		"onCommand:template-library.set-api-endpoint",
+		"onCommand:template-library.config-actions",
+		"onCommand:template-library.interactive-actions"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"menus": {
 			"explorer/context": [
 				{
-					"command": "template-library.actions",
+					"command": "template-library.set-api-endpoint",
+					"group": "myGroup@1"
+				},
+				{
+					"command": "template-library.config-actions",
+					"group": "myGroup@1"
+				},
+				{
+					"command": "template-library.interactive-actions",
 					"group": "myGroup@1"
 				}
 			],
 			"editor/context": [
 				{
-					"command": "template-library.actions",
+					"command": "template-library.set-api-endpoint",
+					"group": "myGroup@2"
+				},
+				{
+					"command": "template-library.config-actions",
+					"group": "myGroup@2"
+				},
+				{
+					"command": "template-library.interactive-actions",
 					"group": "myGroup@2"
 				}
 			]
 		},
 		"commands": [
 			{
-				"command": "template-library.actions",
-				"title": "Template library actions"
+				"command": "template-library.set-api-endpoint",
+				"title": "Template library set REST API endpoint"
+			},
+			{
+				"command": "template-library.config-actions",
+				"title": "Template library config actions"
+			},
+			{
+				"command": "template-library.interactive-actions",
+				"title": "Template library interactive actions"
 			}
 		]
 	},
