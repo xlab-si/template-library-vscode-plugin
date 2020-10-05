@@ -5,7 +5,7 @@ import * as restApi from './rest-api-calls';
 import { MultiStepInput } from './helpers';
 import { CURRENT_DIR_PATH } from './extension';
 
-export async function downloadTemplateAction(context: ExtensionContext) {
+export async function downloadTemplateInteractiveAction(context: ExtensionContext) {
 
     class MyButton implements QuickInputButton {
         constructor(public iconPath: ThemeIcon, public tooltip: string) { }
@@ -103,7 +103,7 @@ export async function downloadTemplateAction(context: ExtensionContext) {
             prompt: 'Type in a path where template version files will be downloaded to',
             buttons: [backButton],
             shouldResume: shouldResume,
-            validate: validateEmpty
+            validate: validatePath
         });
 
         if (destinationFolderInput instanceof MyButton) {
@@ -117,8 +117,13 @@ export async function downloadTemplateAction(context: ExtensionContext) {
             window.showInformationMessage(`Template '${state.templateName}' was downloaded successfully to '${state.filesDestination}'!`);
             return;
         } else {
-            if (templateVersionFilesResponse) {
-                window.showErrorMessage(templateVersionFilesResponse.data);
+            if (templateVersionFilesResponse?.data) {
+                let data = templateVersionFilesResponse.data;
+                if (data instanceof String) {
+                    window.showErrorMessage(data as string);
+                } else {
+                    window.showErrorMessage("Downloading template version files has failed! Please try again.");
+                }
             } else {
                 window.showErrorMessage("Downloading template version files has failed! Please try again.");
             }
@@ -126,49 +131,30 @@ export async function downloadTemplateAction(context: ExtensionContext) {
         }
     }
 
-    function getDirectories(path: string) {
-        return fs.readdirSync(path).filter(function (file) {
-            return fs.statSync(path + '/' + file).isDirectory();
-        });
-    }
-
     function shouldResume() {
         return new Promise<boolean>((resolve, reject) => {
         });
     }
 
-    async function validateEmpty(value: string) {
-        return value === '' ? 'Emtpy value is not allowed' : undefined;
-    }
-
     async function validatePath(value: string) {
         if (value === '') {
             return 'Emtpy value is not allowed';
-        }
+        }   
 
-        if (await !fileExists(value)) {
-            return `Path '${value}' does not exist! Try again.`;
+        if (fileExists(value)) {
+            return `Path '${value}' already exists! Try again with a new one.`;
         } else {
-            if (await isDirectory(value)) {
-                return `Path '${value}' is a directory! Please provide file name too.`;
-            }
+            return undefined;
         }
-        return undefined;
     }
 
-    async function fileExists(path: string) {
-        return fs.stat(path, (exists) => {
-            if (exists === null) {
-                return true;
-            } else if (exists.code === 'ENOENT') {
-                return false;
-            }
-        });
-    }
-
-    async function isDirectory(path: string) {
-        var stat = fs.lstatSync(path);
-        return stat.isDirectory;
+    function fileExists(path: string): boolean {
+        if (fs.existsSync(path)) {
+            console.log(path);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     const state = await collectInputs();

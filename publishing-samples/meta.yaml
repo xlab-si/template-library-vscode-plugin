@@ -11,5 +11,4 @@ repository: https://github.com/radon-h2020/radon-template-library-publishing-ser
 category: Other
 spec:
   extensions:
-    # only works with manual intervention!
-    - https://template-library-radon.xlab.si/docs/_downloads/template-library-plugin-0.0.1.vsix
+    - https://raw.githubusercontent.com/radon-h2020/radon-plugin-registry/master/radon/radon-template-library/0.0.2/template-library-plugin-0.0.2.vsix

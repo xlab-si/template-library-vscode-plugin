@@ -1,17 +1,18 @@
 import * as vscode from 'vscode';
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import * as FormData from 'form-data';
 import * as fs from 'fs';
 
-import DateTimeFormat = Intl.DateTimeFormat;
+const axios = require('axios').default;
 
-export let REST_API_ENDPOINT = "https://template-library-radon.xlab.si/api";
+export let REST_API_ENDPOINT = 'https://template-library-radon.xlab.si/api';
 
 interface RequestHeaders {
     [key: string]: any
 }
 
 export let JWT_BEARER_TOKEN: string;
+export let COOKIES: string;
 export const SUCCESSFULL_STATUS_CODES = [200, 201, 202];
 
 export async function configureApiEndpoint(restApiEndpoint: string) {
@@ -19,12 +20,12 @@ export async function configureApiEndpoint(restApiEndpoint: string) {
 }
 
 export async function addInterceptors() {
-    await axios.interceptors.request.use(request => {
+    await axios.interceptors.request.use((request: any) => {
         console.log('Starting Request', request);
         return request;
     });
 
-    await axios.interceptors.response.use(response => {
+    await axios.interceptors.response.use((response: any) => {
         console.log('Response:', response);
         return response;
     });
@@ -34,25 +35,32 @@ export async function getCurrentUser(): Promise<AxiosResponse<any> | null> {
     await addInterceptors();
     let httpResponse: AxiosResponse<any> | null = null;
 
-    await axios.get(REST_API_ENDPOINT + '/users/current', { timeout: 5000 })
-        .then(function (response) {
+    let requestHeaders: RequestHeaders = {};
+    if (JWT_BEARER_TOKEN) {
+        requestHeaders['Authorization'] = `Bearer ${JWT_BEARER_TOKEN}`;
+    }
+    if (COOKIES) {
+        requestHeaders['cookie'] = COOKIES;
+    }
+
+    await axios.get(REST_API_ENDPOINT + '/users/current', { headers: requestHeaders, timeout: 5000 })
+        .then(function (response: AxiosResponse<any> | null) {
             console.log(response);
             httpResponse = response;
         })
-        .catch(function (error) {
+        .catch(function (error: any) {
             if (error.code === 'ECONNABORTED') {
                 httpResponse = null;
             } else {
                 console.log(error);
                 httpResponse = error;
-                vscode.window.showInformationMessage(error);
             }
         });
 
     return httpResponse;
 }
 
-export async function postLogin(username: string, password: string): Promise<AxiosResponse<any> | null> {
+export async function postNativeLogin(username: string, password: string): Promise<AxiosResponse<any> | null> {
     let httpResponse: AxiosResponse<any> | null = null;
 
     const user = JSON.stringify({
@@ -63,11 +71,11 @@ export async function postLogin(username: string, password: string): Promise<Axi
     let requestHeaders: RequestHeaders = { 'Content-Type': 'application/json' };
 
     await axios.post(REST_API_ENDPOINT + '/auth/login', user, { headers: requestHeaders })
-        .then(function (response) {
+        .then(function (response: AxiosResponse<any>) {
             console.log(response);
             JWT_BEARER_TOKEN = response.data.token;
             httpResponse = response;
-        }).catch(function (error) {
+        }).catch(function (error: any) {
             console.log(error);
             if (error.response) {
                 httpResponse = error.response;
@@ -88,13 +96,16 @@ export async function getTemplates(): Promise<AxiosResponse<any> | null> {
     if (JWT_BEARER_TOKEN) {
         requestHeaders['Authorization'] = `Bearer ${JWT_BEARER_TOKEN}`;
     }
+    if (COOKIES) {
+        requestHeaders['cookie'] = COOKIES;
+    }
 
     await axios.get(REST_API_ENDPOINT + '/templates', { headers: requestHeaders })
-        .then(function (response) {
+        .then(function (response: AxiosResponse<any>) {
             console.log(response);
             httpResponse = response;
         })
-        .catch(function (error) {
+        .catch(function (error: any) {
             console.log(error);
             if (error.response) {
                 httpResponse = error.response;
@@ -115,13 +126,16 @@ export async function getTemplateTypes(): Promise<AxiosResponse<any> | null> {
     if (JWT_BEARER_TOKEN) {
         requestHeaders['Authorization'] = `Bearer ${JWT_BEARER_TOKEN}`;
     }
+    if (COOKIES) {
+        requestHeaders['cookie'] = COOKIES;
+    }
 
     await axios.get(REST_API_ENDPOINT + '/template_types', { headers: requestHeaders })
-        .then(function (response) {
+        .then(function (response: AxiosResponse<any>) {
             console.log(response);
             httpResponse = response;
         })
-        .catch(function (error) {
+        .catch(function (error: any) {
             console.log(error);
             if (error.response) {
                 httpResponse = error.response;
@@ -142,13 +156,16 @@ export async function getTemplateVersions(templateName: string): Promise<AxiosRe
     if (JWT_BEARER_TOKEN) {
         requestHeaders['Authorization'] = `Bearer ${JWT_BEARER_TOKEN}`;
     }
+    if (COOKIES) {
+        requestHeaders['cookie'] = COOKIES;
+    }
 
     await axios.get(REST_API_ENDPOINT + `/templates/${templateName}/versions`, { headers: requestHeaders })
-        .then(function (response) {
+        .then(function (response: AxiosResponse<any>) {
             console.log(response);
             httpResponse = response;
         })
-        .catch(function (error) {
+        .catch(function (error: any) {
             console.log(error);
             if (error.response) {
                 httpResponse = error.response;
@@ -169,9 +186,12 @@ export async function getTemplateVersionFiles(templateName: string, versionName:
     if (JWT_BEARER_TOKEN) {
         requestHeaders['Authorization'] = `Bearer ${JWT_BEARER_TOKEN}`;
     }
+    if (COOKIES) {
+        requestHeaders['cookie'] = COOKIES;
+    }
 
     await axios.get(REST_API_ENDPOINT + `/templates/${templateName}/versions/${versionName}/files`, { headers: requestHeaders, responseType: 'arraybuffer', timeout: 10000, })
-        .then(function (response) {
+        .then(function (response: AxiosResponse<any>) {
             console.log(response);
             httpResponse = response;
 
@@ -182,7 +202,7 @@ export async function getTemplateVersionFiles(templateName: string, versionName:
                 console.log('The file has been saved!');
             });
         })
-        .catch(function (error) {
+        .catch(function (error: any) {
             console.log(error);
             if (error.response) {
                 httpResponse = error.response;
@@ -210,12 +230,15 @@ export async function postTemplate(name: string, description: string, templateTy
     if (JWT_BEARER_TOKEN) {
         requestHeaders['Authorization'] = `Bearer ${JWT_BEARER_TOKEN}`;
     }
+    if (COOKIES) {
+        requestHeaders['cookie'] = COOKIES;
+    }
 
     await axios.post(REST_API_ENDPOINT + '/templates', template, { headers: requestHeaders })
-        .then(function (response) {
+        .then(function (response: AxiosResponse<any>) {
             console.log(response);
             httpResponse = response;
-        }).catch(function (error) {
+        }).catch(function (error: any) {
             console.log(error);
             if (error.response) {
                 httpResponse = error.response;
@@ -253,12 +276,15 @@ export async function postVersion(templateName: string, versionName: string, tem
     if (JWT_BEARER_TOKEN) {
         requestHeaders['Authorization'] = `Bearer ${JWT_BEARER_TOKEN}`;
     }
+    if (COOKIES) {
+        requestHeaders['cookie'] = COOKIES;
+    }
 
     await axios.post(REST_API_ENDPOINT + `/templates/${templateName}/versions`, form, { headers: requestHeaders })
-        .then(function (response) {
+        .then(function (response: AxiosResponse<any>) {
             console.log(response);
             httpResponse = response;
-        }).catch(function (error) {
+        }).catch(function (error: any) {
             console.log(error);
             if (error.response) {
                 httpResponse = error.response;
@@ -270,24 +296,4 @@ export async function postVersion(templateName: string, versionName: string, tem
         });
 
     return httpResponse;
-}
-
-export class Template {
-    constructor(id: number, name: string, description: string, templateTypeId: number, publicAccess: boolean, createdBy: number, createdAt: DateTimeFormat) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.templateTypeId = templateTypeId;
-        this.publicAccess = publicAccess;
-        this.createdBy = createdBy;
-        this.createdAt = createdAt;
-    }
-
-    id: number;
-    name: string;
-    description: string;
-    templateTypeId: number;
-    publicAccess: boolean;
-    createdBy: number;
-    createdAt: DateTimeFormat;
 }

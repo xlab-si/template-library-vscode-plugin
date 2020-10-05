@@ -11,7 +11,6 @@ components:
     type: cheEditor
     alias: theia-editor
   - type: chePlugin
-    # works only with manual intervention! for testing purposes only
     reference: >-
-      https://template-library-radon.xlab.si/docs/_downloads/meta.yaml
+      https://raw.githubusercontent.com/radon-h2020/radon-plugin-registry/master/radon/radon-template-library/latest/meta.yaml
     alias: radon-template-library-plugin

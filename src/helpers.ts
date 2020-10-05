@@ -82,6 +82,7 @@ export class MultiStepInput {
                 input.totalSteps = totalSteps;
                 input.placeholder = placeholder;
                 input.items = items;
+                input.ignoreFocusOut = true;
                 if (selectMultiple) {
                     input.canSelectMany = true;
                 }
@@ -131,6 +132,7 @@ export class MultiStepInput {
                 if (password) {
                     input.password = password;
                 }
+                input.ignoreFocusOut = true;
                 input.prompt = prompt;
                 input.buttons = [
                     ...(this.steps.length > 1 ? [QuickInputButtons.Back] : []),
@@ -184,7 +186,6 @@ export class MultiStepInput {
 
 
 export async function authenticate(context: ExtensionContext) {
-
     const loginTitle = 'Login to Template library';
 
     class MyButton implements QuickInputButton {
@@ -192,6 +193,8 @@ export async function authenticate(context: ExtensionContext) {
     }
 
     const backButton = new MyButton(new ThemeIcon("debug-reverse-continue"), 'Back');
+
+    let userName: string = '';
 
     async function collectInputs() {
         let currentUserResponse = await restApi.getCurrentUser();
@@ -201,7 +204,7 @@ export async function authenticate(context: ExtensionContext) {
             return;
         } else {
             if (currentUserResponse) {
-                window.showInformationMessage('You will need to login as a native user!');
+                window.showInformationMessage('You will need to login as a KeyCloak or native TPS user!');
                 await MultiStepInput.run(input => inputUsername(input));
                 return;
             } else {
@@ -216,11 +219,13 @@ export async function authenticate(context: ExtensionContext) {
             title: loginTitle,
             step: 1,
             totalSteps: 2,
-            value: '',
+            value: userName,
             prompt: 'Username',
             validate: validateEmpty,
             shouldResume: shouldResume
         });
+
+        userName = username;
 
         return (input: MultiStepInput) => inputPassword(input, username);
     }
@@ -242,16 +247,15 @@ export async function authenticate(context: ExtensionContext) {
             return (input: MultiStepInput) => inputUsername(input);
         }
 
-        let loginResponse = await restApi.postLogin(username, password);
-
+        let loginResponse = await restApi.postNativeLogin(username, password);
         if (loginResponse && restApi.SUCCESSFULL_STATUS_CODES.includes(loginResponse.status)) {
-            window.showInformationMessage('Login has been successful!');
+            window.showInformationMessage('Native login has been successful!');
             return;
         } else {
             if (loginResponse) {
                 window.showErrorMessage(loginResponse.data);
             } else {
-                window.showErrorMessage('Login has failed! Please try again.');
+                window.showErrorMessage('Native TPS login attempt has failed! Please try again.');
             }
             return (input: MultiStepInput) => inputUsername(input);
         }

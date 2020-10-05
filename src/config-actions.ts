@@ -5,6 +5,8 @@ import * as fs from 'fs';
 import * as restApi from './rest-api-calls';
 import { MultiStepInput } from './helpers';
 import { CURRENTLY_SELECTED_FILE, CURRENT_DIR_PATH } from './extension';
+import { strict } from 'assert';
+import { stringify } from 'querystring';
 
 export async function configAction(context: ExtensionContext) {
 
@@ -172,8 +174,13 @@ export async function configAction(context: ExtensionContext) {
             window.showInformationMessage(`Template '${downloadState.templateName}' was downloaded successfully to '${downloadState.filesDestination}'!`);
             return;
         } else {
-            if (templateVersionFilesResponse) {
-                window.showErrorMessage(templateVersionFilesResponse.data);
+            if (templateVersionFilesResponse?.data) {
+                let data = templateVersionFilesResponse.data;
+                if (data instanceof String) {
+                    window.showErrorMessage(data as string);
+                } else {
+                    window.showErrorMessage("Downloading template version files has failed! Please try again.");
+                }
             } else {
                 window.showErrorMessage("Downloading template version files has failed! Please try again.");
             }
@@ -326,7 +333,7 @@ export async function configAction(context: ExtensionContext) {
 
             if ("download_version_name" in jsonConfig) {
                 presentKeys.push("download_version_name");
-                downloadState.versionName = jsonConfig["version_name"];
+                downloadState.versionName = jsonConfig["download_version_name"];
             } else {
                 absentKeys.push("download_version_name");
                 returnValue = false;
@@ -337,7 +344,7 @@ export async function configAction(context: ExtensionContext) {
                 let downloadFilePath = join(CURRENT_DIR_PATH, jsonConfig["download_path"]);
 
                 if (fileExists(downloadFilePath)) {
-                    window.showErrorMessage(`File path '${downloadFilePath}' from key 'download_path' already exists. Plaese pick a new one.`);
+                    window.showErrorMessage(`File path '${downloadFilePath}' from key 'download_path' already exists. Please pick a new one.`);
                     returnValue = false;
                 } else {
                     downloadState.filesDestination = downloadFilePath;
@@ -359,14 +366,13 @@ export async function configAction(context: ExtensionContext) {
         });
     }
 
-    async function fileExists(path: string) {
-        return fs.stat(path, (exists) => {
-            if (exists === null) {
-                return true;
-            } else if (exists.code === 'ENOENT') {
-                return false;
-            }
-        });
+    function fileExists(path: string): boolean {
+        if (fs.existsSync(path)) {
+            console.log(path);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     const result = await collectInputs();

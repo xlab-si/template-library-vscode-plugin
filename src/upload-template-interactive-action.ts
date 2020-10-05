@@ -4,7 +4,7 @@ import * as restApi from './rest-api-calls';
 import { MultiStepInput } from './helpers';
 import { CURRENTLY_SELECTED_FILE } from './extension';
 
-export async function uploadTemplateActionInteractive(context: ExtensionContext) {
+export async function uploadTemplateInteractiveAction(context: ExtensionContext) {
 
     class MyButton implements QuickInputButton {
         constructor(public iconPath: ThemeIcon, public tooltip: string) { }

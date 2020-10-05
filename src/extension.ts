@@ -4,8 +4,8 @@ import * as path from 'path';
 import { authenticate } from './helpers';
 import { configAction } from './config-actions';
 import { setApiEndpointAction } from './set-api-endpoint-action';
-import { uploadTemplateActionInteractive } from './upload-template-interactive-action';
-import { downloadTemplateAction } from './download-template-interactive-action';
+import { uploadTemplateInteractiveAction } from './upload-template-interactive-action';
+import { downloadTemplateInteractiveAction } from './download-template-interactive-action';
 
 export let CURRENTLY_SELECTED_FILE: string;
 export let CURRENT_DIR_PATH: string;
@@ -18,6 +18,8 @@ export function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('template-library.config-actions', async (uri?: Uri) => {
 		if (uri) {
+			CURRENTLY_SELECTED_FILE = '';
+			CURRENT_DIR_PATH = '';
 			window.showInformationMessage(`Selected file is: ${uri.fsPath}`);
 			let fileExtension = uri.fsPath.split('.').pop();
 			if (fileExtension!! === 'json') {
@@ -35,6 +37,8 @@ export function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(commands.registerCommand('template-library.interactive-actions', async (uri?: Uri) => {
 		if (uri) {
+			CURRENTLY_SELECTED_FILE = '';
+			CURRENT_DIR_PATH = '';
 			window.showInformationMessage(`Selected file is: ${uri.fsPath}`);
 			let fileExtension = uri.fsPath.split('.').pop();
 			if (['csar', 'zip', 'tar', 'rar', 'gz', 'tgz', 'yml', 'yaml', 'tosca'].includes(fileExtension!!)) {
@@ -48,8 +52,8 @@ export function activate(context: ExtensionContext) {
 
 		await authenticate(context);
 		const options: { [key: string]: (context: ExtensionContext) => Promise<void> } = {
-			uploadTemplateActionInteractive,
-			downloadTemplateAction,
+			uploadTemplateInteractiveAction,
+			downloadTemplateInteractiveAction,
 		};
 		const quickPick = window.createQuickPick();
 		quickPick.items = Object.keys(options).map(label => ({ label }));
