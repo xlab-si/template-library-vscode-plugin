@@ -1,7 +1,7 @@
 import { commands, window, ExtensionContext, Uri } from 'vscode';
 import * as path from 'path';
 
-import { authenticate } from './helpers';
+import { authenticate, deleteLoginInfo } from './helpers';
 import { configAction } from './config-actions';
 import { setApiEndpointAction } from './set-api-endpoint-action';
 import { uploadTemplateInteractiveAction } from './upload-template-interactive-action';
@@ -10,11 +10,10 @@ import { downloadTemplateInteractiveAction } from './download-template-interacti
 export let CURRENTLY_SELECTED_FILE: string;
 export let CURRENT_DIR_PATH: string;
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(commands.registerCommand('template-library.set-api-endpoint', async (uri?: Uri) => {
 		await setApiEndpointAction(context);
 	}));
-
 
 	context.subscriptions.push(commands.registerCommand('template-library.config-actions', async (uri?: Uri) => {
 		if (uri) {
@@ -57,6 +56,8 @@ export function activate(context: ExtensionContext) {
 		};
 		const quickPick = window.createQuickPick();
 		quickPick.items = Object.keys(options).map(label => ({ label }));
+		quickPick.ignoreFocusOut = true;
+		quickPick.canSelectMany = false;
 		quickPick.onDidChangeSelection(selection => {
 			if (selection[0]) {
 				options[selection[0].label](context)
@@ -67,6 +68,10 @@ export function activate(context: ExtensionContext) {
 		quickPick.show();
 	}));
 
+    context.subscriptions.push(commands.registerCommand("template-library.delete-login-info", async () => {
+        await deleteLoginInfo(context.workspaceState);
+		window.showInformationMessage("Login info deleted.");
+	}));
 }
 
 export function deactivate() { }

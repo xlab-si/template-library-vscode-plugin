@@ -48,5 +48,5 @@ export async function setApiEndpointAction(context: ExtensionContext) {
     }
 
     await MultiStepInput.run(input => inputRestApiUrl(input));
-    window.showInformationMessage('Template library action has finished.');
+    window.showInformationMessage('Template library set API endpoint action has finished.');
 }

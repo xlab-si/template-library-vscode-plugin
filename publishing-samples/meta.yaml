@@ -1,7 +1,7 @@
 apiVersion: v2
 publisher: radon
 name: template-library-plugin
-version: 0.0.1
+version: 0.0.3
 type: VS Code extension
 displayName: template-library-plugin
 title: RADON Template Library Plugin
@@ -11,4 +11,4 @@ repository: https://github.com/radon-h2020/radon-template-library-publishing-ser
 category: Other
 spec:
   extensions:
-    - https://raw.githubusercontent.com/radon-h2020/radon-plugin-registry/master/radon/radon-template-library/0.0.2/template-library-plugin-0.0.2.vsix
+    - https://raw.githubusercontent.com/radon-h2020/radon-plugin-registry/master/radon/radon-template-library/0.0.3/template-library-plugin-0.0.3.vsix

@@ -5,8 +5,6 @@ import * as fs from 'fs';
 import * as restApi from './rest-api-calls';
 import { MultiStepInput } from './helpers';
 import { CURRENTLY_SELECTED_FILE, CURRENT_DIR_PATH } from './extension';
-import { strict } from 'assert';
-import { stringify } from 'querystring';
 
 export async function configAction(context: ExtensionContext) {
 

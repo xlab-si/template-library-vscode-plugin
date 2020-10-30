@@ -3,7 +3,7 @@
 	"displayName": "template-library-plugin",
 	"description": "This is a VS Code/RADON IDE extension for Template library publishing service.",
 	"publisher": "radon",
-	"version": "0.0.1",
+	"version": "0.0.3",
 	"engines": {
 		"vscode": "^1.49.0"
 	},
@@ -13,7 +13,8 @@
 	"activationEvents": [
 		"onCommand:template-library.set-api-endpoint",
 		"onCommand:template-library.config-actions",
-		"onCommand:template-library.interactive-actions"
+		"onCommand:template-library.interactive-actions",
+		"onCommand:template-library.delete-login-info"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -25,17 +26,21 @@
 				},
 				{
 					"command": "template-library.config-actions",
-					"group": "myGroup@1"
+					"group": "myGroup@2"
 				},
 				{
 					"command": "template-library.interactive-actions",
-					"group": "myGroup@1"
+					"group": "myGroup@3"
+				},
+				{
+					"command": "template-library.delete-login-info",
+					"group": "myGroup@4"
 				}
 			],
 			"editor/context": [
 				{
 					"command": "template-library.set-api-endpoint",
-					"group": "myGroup@2"
+					"group": "myGroup@1"
 				},
 				{
 					"command": "template-library.config-actions",
@@ -43,7 +48,11 @@
 				},
 				{
 					"command": "template-library.interactive-actions",
-					"group": "myGroup@2"
+					"group": "myGroup@3"
+				},
+				{
+					"command": "template-library.delete-login-info",
+					"group": "myGroup@4"
 				}
 			]
 		},
@@ -59,6 +68,10 @@
 			{
 				"command": "template-library.interactive-actions",
 				"title": "Template library interactive actions"
+			},
+			{
+				"command": "template-library.delete-login-info",
+				"title": "Template library delete login info"
 			}
 		]
 	},
@@ -73,27 +86,34 @@
 		"clean": "rimraf out/"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.49.0",
 		"@types/glob": "^7.1.3",
+		"@types/jsdom": "^16.2.5",
 		"@types/mocha": "^8.0.0",
 		"@types/node": "^14.0.27",
-		"eslint": "^7.9.0",
+		"@types/request": "^2.48.5",
+		"@types/tough-cookie": "^4.0.0",
+		"@types/vscode": "^1.49.0",
 		"@typescript-eslint/eslint-plugin": "^4.1.1",
 		"@typescript-eslint/parser": "^4.1.1",
+		"eslint": "^7.9.0",
 		"glob": "^7.1.6",
 		"mocha": "^8.1.3",
-		"typescript": "^4.0.2",
-		"vscode-test": "^1.4.0",
-		"vsce": "^1.79.5",
 		"rimraf": "^3.0.2",
 		"terser-webpack-plugin": "^4.2.2",
 		"ts-loader": "^8.0.4",
+		"typescript": "^4.0.2",
+		"vsce": "^1.79.5",
+		"vscode-test": "^1.4.0",
 		"webpack": "^4.44.2",
 		"webpack-cli": "^3.3.12"
 	},
 	"dependencies": {
 		"axios": "^0.20.0",
+		"axios-cookiejar-support": "^1.0.1",
 		"form-data": "^3.0.0",
-		"fs": "0.0.1-security"
+		"fs": "0.0.1-security",
+		"jsdom": "^16.4.0",
+		"request": "^2.88.2",
+		"tough-cookie": "^4.0.0"
 	}
 }

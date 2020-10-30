@@ -14,3 +14,5 @@ components:
     reference: >-
       https://raw.githubusercontent.com/radon-h2020/radon-plugin-registry/master/radon/radon-template-library/latest/meta.yaml
     alias: radon-template-library-plugin
+    # you can also use the latest meta.yaml from this repository
+    # https://raw.githubusercontent.com/radon-h2020/radon-template-library-publishing-service-plugin/master/publishing-samples/meta.yaml
