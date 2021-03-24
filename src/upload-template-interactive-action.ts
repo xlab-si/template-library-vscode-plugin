@@ -21,7 +21,6 @@ export async function uploadTemplateInteractiveAction(context: ExtensionContext)
         versionName: string;
         readmeFile: string;
         templateFile: string;
-        implementationFiles: string[];
     }
 
     const pickActionTitle = 'Pick your desired template action';
@@ -36,7 +35,6 @@ export async function uploadTemplateInteractiveAction(context: ExtensionContext)
 
     async function pickCreateTemplateAction(input: MultiStepInput, state: Partial<CreateTemplateState>): Promise<any> {
         let pickActionOptions = ['create a whole new template', 'create just a new template version'].map(label => ({ label }));
-        state.implementationFiles = [];
 
         let pick = await input.showQuickPick({
             title: pickActionTitle,
@@ -291,56 +289,7 @@ export async function uploadTemplateInteractiveAction(context: ExtensionContext)
             });
         }
 
-        return (input: MultiStepInput) => pickImplementationFiles(input, state);
-    }
-
-    async function pickImplementationFiles(input: MultiStepInput, state: Partial<CreateTemplateState>): Promise<any> {
-        let pickImplementationFileOptions = ['send empty', 'pick from filesystem'].map(label => ({ label }));
-        state.implementationFiles = [];
-
-        let pick = await input.showQuickPick({
-            title: createTemplateVersionTitle,
-            step: 4,
-            totalSteps: 4,
-            placeholder: 'Pick template implementation file(s)',
-            items: pickImplementationFileOptions,
-            activeItem: pickImplementationFileOptions[0],
-            buttons: [backButton],
-            shouldResume: shouldResume
-        });
-
-        if (pick instanceof MyButton) {
-            return (input: MultiStepInput) => pickTemplateFile(input, state);
-        }
-
-        if (pick === pickImplementationFileOptions[0]) {
-            state.implementationFiles = undefined;
-        } else {
-            const options: OpenDialogOptions = {
-                title: createTemplateVersionTitle,
-                defaultUri: Uri.file("/projects"),
-                canSelectMany: true,
-                canSelectFolders: false,
-                canSelectFiles: true,
-                openLabel: 'Open',
-                filters: {
-                    'Implementation files': ['yml', 'yaml']
-                }
-            };
-
-            await window.showOpenDialog(options).then(fileUri => {
-                console.log(fileUri);
-                if (fileUri instanceof Array) {
-                    for (let file of fileUri) {
-                        console.log('Selected implementation file: ' + file.fsPath);
-                        state.implementationFiles = [];
-                        state.implementationFiles.push(file.fsPath);
-                    }
-                }
-            });
-        }
-
-        let postVersionResponse = await restApi.postVersion(state.templateName!, state.versionName!, state.templateFile!, state.readmeFile!, state.implementationFiles!);
+        let postVersionResponse = await restApi.postVersion(state.templateName!, state.versionName!, state.templateFile!, state.readmeFile!);
 
         if (postVersionResponse && restApi.SUCCESSFULL_STATUS_CODES.includes(postVersionResponse.status)) {
             window.showInformationMessage(`New version '${state.versionName}' for template '${state.templateName}' was successfully inserted!`);

@@ -207,10 +207,10 @@ export async function authenticate(context: ExtensionContext) {
     let cookieJar: CookieJar;
     let doc: Document;
     let saveNeeded = true;
-    const authenticationMethodChoices: { [key: string]: AuthProvider | "XLAB" | "TPS" } = {};
+    const authenticationMethodChoices: { [key: string]: AuthProvider | "XLAB" } = {};
 
     let userName: string = '';
-    let chosenAuthProvider: AuthProvider | "XLAB" | "TPS";
+    let chosenAuthProvider: AuthProvider | "XLAB";
 
     async function performAuthentication() {
         let needsLogin = false;
@@ -261,11 +261,9 @@ export async function authenticate(context: ExtensionContext) {
         const authProviders = getAuthProviders(doc, credsForAuthResponse.headers["location"]!!);
         if (authProviders.length === 0) {
             authenticationMethodChoices["Log in as an XLAB KeyCloak native user"] = "XLAB";
-            authenticationMethodChoices["Log in as a Template library native user"] = "TPS";
         } else {
             authenticationMethodChoices["Log in as an XLAB KeyCloak native user"] = "XLAB";
             authProviders.forEach(i => { authenticationMethodChoices[i.text] = i; });
-            authenticationMethodChoices["Log in as a Template library native user"] = "TPS";
         }
 
         await MultiStepInput.run(input => pickAuthenticationMethod(input));
@@ -362,26 +360,8 @@ export async function authenticate(context: ExtensionContext) {
             return (input: MultiStepInput) => inputUsername(input);
         }
 
-        if (chosenAuthProvider === "TPS") {
-            console.log("LOGIN STEP 4a: native Template library login");
-
-            let loginResponse = await restApi.postNativeLogin(username, password);
-            if (loginResponse && restApi.SUCCESSFULL_STATUS_CODES.includes(loginResponse.status)) {
-                window.showInformationMessage('Native Template library login has been successful!');
-                console.log("Login done!");
-                saveNeeded = false;
-                await deleteLoginInfo(context.workspaceState);
-                return;
-            } else {
-                if (loginResponse) {
-                    window.showErrorMessage(loginResponse.data);
-                } else {
-                    window.showErrorMessage('Native Template library login attempt has failed! Please try again.');
-                }
-                return (input: MultiStepInput) => inputUsername(input);
-            }
-        } else if (chosenAuthProvider === "XLAB") {
-            console.log("LOGIN STEP 4b: native XLAB KeyCloak login");
+        if (chosenAuthProvider === "XLAB") {
+            console.log("LOGIN STEP 4a: native XLAB KeyCloak login");
             const loginFormSubmitResponse = await doKeycloakLoginPage(cookieJar, doc, userName, password);
 
             let currentUserResponse = await restApi.getCurrentUser(cookieJar);
@@ -389,13 +369,14 @@ export async function authenticate(context: ExtensionContext) {
                 window.showInformationMessage('XLAB KeyCloak Template library login has been successful!');
                 return;
             } else {
-                window.showInformationMessage('XLAB KeyCloak Template library login attempt has failed! Please try again.');
+                console.log(currentUserResponse);
+                window.showErrorMessage('XLAB KeyCloak Template library login attempt has failed! Please try again.');
                 saveNeeded = false;
                 await deleteLoginInfo(context.workspaceState);
-                return;
+                await performAuthentication();
             }
         } else {
-            console.log("LOGIN STEP 4c-1: clicking on auth provider button link");
+            console.log("LOGIN STEP 4b-1: clicking on auth provider button link");
             const secondaryAuthProviderButtonResponse = await doCookieRequestFollowRedirects(
                 "GET",
                 chosenAuthProvider.href,
@@ -405,7 +386,7 @@ export async function authenticate(context: ExtensionContext) {
 
             //@ts-ignore
             const secondaryAuthProviderDoc = new JSDOM(secondaryAuthProviderButtonResponse.body).window.document;
-            console.log("LOGIN STEP 4c-2: submitting secondary auth provider login page");
+            console.log("LOGIN STEP 4b-2: submitting secondary auth provider login page");
             const secondaryAuthProviderloginFormSubmitResponse = await doKeycloakLoginPage(cookieJar, secondaryAuthProviderDoc, userName, password);
             console.log(secondaryAuthProviderloginFormSubmitResponse);
 
@@ -417,7 +398,7 @@ export async function authenticate(context: ExtensionContext) {
                 window.showErrorMessage(`${chosenAuthProvider.text} Template library login attempt has failed! Please try again.`);
                 saveNeeded = false;
                 await deleteLoginInfo(context.workspaceState);
-                return;
+                await performAuthentication();
             }
         }
     }
@@ -510,7 +491,7 @@ export async function authenticate(context: ExtensionContext) {
         console.log("getting auth providers");
 
         const authProviders: AuthProvider[] = [];
-        const authProviderElements = smartQuerySelectorAll(doc, "#kc-social-providers li a");
+        const authProviderElements = smartQuerySelectorAll(doc, "#kc-social-providers ul a");
         authProviderElements.forEach(i => {
             authProviders.push({
                 //@ts-ignore

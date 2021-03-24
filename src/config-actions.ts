@@ -24,7 +24,6 @@ export async function configAction(context: ExtensionContext) {
         versionName: string;
         readmeFile: string;
         templateFile: string;
-        implementationFiles: string[];
     }
 
 
@@ -151,7 +150,7 @@ export async function configAction(context: ExtensionContext) {
     }
 
     async function intitateCreateVersionRequest(uploadState: Partial<CreateTemplateState>) {
-        let postVersionResponse = await restApi.postVersion(uploadState.templateName!, uploadState.versionName!, uploadState.templateFile!, uploadState.readmeFile!, uploadState.implementationFiles!);
+        let postVersionResponse = await restApi.postVersion(uploadState.templateName!, uploadState.versionName!, uploadState.templateFile!, uploadState.readmeFile!);
 
         if (postVersionResponse && restApi.SUCCESSFULL_STATUS_CODES.includes(postVersionResponse.status)) {
             window.showInformationMessage(`New version '${uploadState.versionName}' for template '${uploadState.templateName}' was successfully inserted!`);
@@ -202,35 +201,35 @@ export async function configAction(context: ExtensionContext) {
         try {
             let returnValue = true;
 
-            if ("upload_template_name" in jsonConfig) {
-                presentKeys.push("upload_template_name");
-                uploadState.templateName = jsonConfig["upload_template_name"];
+            if ("uploadTemplateName" in jsonConfig) {
+                presentKeys.push("uploadTemplateName");
+                uploadState.templateName = jsonConfig["uploadTemplateName"];
             } else {
-                absentKeys.push("upload_template_name");
+                absentKeys.push("uploadTemplateName");
                 returnValue = false;
             }
 
-            if ("upload_template_description" in jsonConfig) {
-                presentKeys.push("upload_template_description");
-                uploadState.description = jsonConfig["upload_template_description"];
+            if ("uploadTemplateDescription" in jsonConfig) {
+                presentKeys.push("uploadTemplateDescription");
+                uploadState.description = jsonConfig["uploadTemplateDescription"];
             } else {
-                absentKeys.push("upload_template_description");
+                absentKeys.push("uploadTemplateDescription");
                 returnValue = false;
             }
 
-            if ("upload_template_type_name" in jsonConfig) {
-                presentKeys.push("upload_template_type_name");
-                uploadState.templateTypeName = jsonConfig["upload_template_type_name"];
+            if ("uploadTemplateTypeName" in jsonConfig) {
+                presentKeys.push("uploadTemplateTypeName");
+                uploadState.templateTypeName = jsonConfig["uploadTemplateTypeName"];
             } else {
-                absentKeys.push("upload_template_type_name");
+                absentKeys.push("uploadTemplateTypeName");
                 returnValue = false;
             }
 
-            if ("upload_public_access" in jsonConfig) {
-                presentKeys.push("upload_public_access");
-                uploadState.publicAccess = jsonConfig["upload_public_access"];
+            if ("uploadPublicAccess" in jsonConfig) {
+                presentKeys.push("uploadPublicAccess");
+                uploadState.publicAccess = jsonConfig["uploadPublicAccess"];
             } else {
-                absentKeys.push("upload_public_access");
+                absentKeys.push("uploadPublicAccess");
                 returnValue = false;
             }
 
@@ -248,63 +247,39 @@ export async function configAction(context: ExtensionContext) {
         try {
             let returnValue = true;
 
-            if ("upload_version_name" in jsonConfig) {
-                presentKeys.push("upload_version_name");
-                uploadState.versionName = jsonConfig["upload_version_name"];
+            if ("uploadVersionName" in jsonConfig) {
+                presentKeys.push("uploadVersionName");
+                uploadState.versionName = jsonConfig["uploadVersionName"];
             } else {
-                absentKeys.push("upload_version_name");
+                absentKeys.push("uploadVersionName");
                 returnValue = false;
             }
 
-            if ("upload_readme_file" in jsonConfig) {
-                presentKeys.push("upload_readme_file");
-                let readmeFilePath = join(CURRENT_DIR_PATH, jsonConfig["upload_readme_file"]);
+            if ("uploadReadmeFile" in jsonConfig) {
+                presentKeys.push("uploadReadmeFile");
+                let readmeFilePath = join(CURRENT_DIR_PATH, jsonConfig["uploadReadmeFile"]);
                 if (fileExists(readmeFilePath)) {
                     uploadState.readmeFile = readmeFilePath;
                 } else {
-                    window.showErrorMessage(`File path '${readmeFilePath}' from key 'upload_readme_file' does not exist.`);
+                    window.showErrorMessage(`File path '${readmeFilePath}' from key 'uploadReadmeFile' does not exist.`);
                     returnValue = false;
                 }
             } else {
-                absentKeys.push("upload_readme_file");
+                absentKeys.push("uploadReadmeFile");
             }
 
-            if ("upload_template_file" in jsonConfig) {
-                presentKeys.push("upload_template_file");
-                let templateFilePath = join(CURRENT_DIR_PATH, jsonConfig["upload_template_file"]);
+            if ("uploadTemplateFile" in jsonConfig) {
+                presentKeys.push("uploadTemplateFile");
+                let templateFilePath = join(CURRENT_DIR_PATH, jsonConfig["uploadTemplateFile"]);
                 if (fileExists(templateFilePath)) {
                     uploadState.templateFile = templateFilePath;
                 } else {
-                    window.showErrorMessage(`File path '${templateFilePath}' from key 'upload_template_file' does not exist.`);
+                    window.showErrorMessage(`File path '${templateFilePath}' from key 'uploadTemplateFile' does not exist.`);
                     returnValue = false;
                 }
             } else {
-                absentKeys.push("upload_template_file");
+                absentKeys.push("uploadTemplateFile");
                 returnValue = false;
-            }
-
-            if ("upload_implementation_files" in jsonConfig) {
-                presentKeys.push("upload_implementation_files");
-                if (Array.isArray(jsonConfig["upload_implementation_files"])) {
-                    let implementationFiles: Array<string> = jsonConfig["upload_implementation_files"];
-                    let updatedImplementationFiles: string[] = [];
-                    for (let file of implementationFiles) {
-                        let implementationFilePath = join(CURRENT_DIR_PATH, file);
-
-                        if (fileExists(implementationFilePath)) {
-                            updatedImplementationFiles.push(join(CURRENT_DIR_PATH, file));
-                        } else {
-                            window.showErrorMessage(`File path '${implementationFilePath}' from key 'upload_implementation_files' does not exist.`);
-                            returnValue = false;
-                        }
-                    }
-                    uploadState.implementationFiles = updatedImplementationFiles;
-                } else {
-                    window.showErrorMessage(`Key 'upload_implementation_files' should be an array.`);
-                    returnValue = false;
-                }
-            } else {
-                absentKeys.push("upload_implementation_files");
             }
 
             return [returnValue, presentKeys, absentKeys];
@@ -321,34 +296,34 @@ export async function configAction(context: ExtensionContext) {
         try {
             let returnValue = true;
 
-            if ("download_template_name" in jsonConfig) {
-                presentKeys.push("download_template_name");
-                downloadState.templateName = jsonConfig["download_template_name"];
+            if ("downloadTemplateName" in jsonConfig) {
+                presentKeys.push("downloadTemplateName");
+                downloadState.templateName = jsonConfig["downloadTemplateName"];
             } else {
-                absentKeys.push("download_template_name");
+                absentKeys.push("downloadTemplateName");
                 returnValue = false;
             }
 
-            if ("download_version_name" in jsonConfig) {
-                presentKeys.push("download_version_name");
-                downloadState.versionName = jsonConfig["download_version_name"];
+            if ("downloadVersionName" in jsonConfig) {
+                presentKeys.push("downloadVersionName");
+                downloadState.versionName = jsonConfig["downloadVersionName"];
             } else {
-                absentKeys.push("download_version_name");
+                absentKeys.push("downloadVersionName");
                 returnValue = false;
             }
 
-            if ("download_path" in jsonConfig) {
-                presentKeys.push("download_path");
-                let downloadFilePath = join(CURRENT_DIR_PATH, jsonConfig["download_path"]);
+            if ("downloadPath" in jsonConfig) {
+                presentKeys.push("downloadPath");
+                let downloadFilePath = join(CURRENT_DIR_PATH, jsonConfig["downloadPath"]);
 
                 if (fileExists(downloadFilePath)) {
-                    window.showErrorMessage(`File path '${downloadFilePath}' from key 'download_path' already exists. Please pick a new one.`);
+                    window.showErrorMessage(`File path '${downloadFilePath}' from key 'downloadPath' already exists. Please pick a new one.`);
                     returnValue = false;
                 } else {
                     downloadState.filesDestination = downloadFilePath;
                 }
             } else {
-                absentKeys.push("download_version_name");
+                absentKeys.push("downloadPath");
                 returnValue = false;
             }
 

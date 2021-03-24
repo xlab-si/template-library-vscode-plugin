@@ -118,44 +118,39 @@ JSON object for creating a template must have all these keys:
 
 |    JSON key      |   Description    |
 |:-----------------|:-----------------|
-| **upload_template_name** | Template name you want to create |
-| **upload_template_description** | Template description |
-| **upload_template_type_name** | Template type name (one of: data, artifact, capability, requirement, relationship, interface, node, group, policy, csar, other) |
-| **upload_public_access** | Make template publicly visible for other TPS users (true/false) |
+| **uploadTemplateName** | Template name you want to create |
+| **uploadTemplateDescription** | Template description |
+| **uploadTemplateTypeName** | Template type name (one of: data, artifact, capability, requirement, relationship, interface, node, group, policy, csar, other) |
+| **uploadPublicAccess** | Make template publicly visible for other TPS users (true/false) |
 
 Example:
 
 ```json
 {
-    "upload_template_name": "aws_bucket",
-    "upload_template_description": "AWS bucket node",
-    "upload_template_type_name": "node",
-    "upload_public_access": "true"
+    "uploadTemplateName": "AwsBucket",
+    "uploadTemplateDescription": "AWS bucket node",
+    "uploadTemplateTypeName": "node",
+    "uploadPublicAccess": "true"
 }
 ```
 ![alt text](./images/upload_config.png "Upload config action")
 
 #### Upload template version JSON config
-When uploading a template version you can use the following keys (`upload_readme_file` and `upload_implementation_files` are optional).
+When uploading a template version you can use the following keys (`uploadReadmeFile` is optional).
 
 |    JSON key      |   Description    |
 |:-----------------|:-----------------|
-| **upload_version_name** | Semantic version name |
-| **upload_readme_file** | Optional path to README file to upload |
-| **upload_template_file** | TOSCA YAML service template file or compressed TOSCA Cloud Service Archive (CSAR) |
-| **upload_implementation_files** | Optional JSON array of paths to TOSCA model implementation files (Ansible playbooks) |
+| **uploadVersionName** | Semantic version name |
+| **uploadReadmeFile** | Optional path to README file to upload |
+| **uploadTemplateFile** | TOSCA YAML service template file or compressed TOSCA Cloud Service Archive (CSAR) |
 
 Example:
 
 ```json
 {
-    "upload_version_name": "2.1.5",
-    "upload_readme_file": "./aws_bucket/README.md",
-    "upload_template_file": "./aws_bucket/service_template.yaml",
-    "upload_implementation_files": [
-        "./aws_bucket/playbooks/create.yaml",
-        "./aws_bucket/playbooks/delete.yaml"
-    ]
+    "uploadVersionName": "2.1.5",
+    "uploadReadmeFile": "./aws_bucket/README.md",
+    "uploadTemplateFile": "./aws_bucket/service_template.yaml"
 }
 ```
 
@@ -167,17 +162,17 @@ file (if you provided just a CSAR without implmentation files, you will get back
 
 |    JSON key      |   Description    |
 |:-----------------|:-----------------|
-| **download_template_name** | Name of the template you want to download |
-| **download_version_name** | Semantic template version you want to get files from |
-| **download_path** | Path where downloaded file will be stored |
+| **downloadTemplateName** | Name of the template you want to download |
+| **downloadVersionName** | Semantic template version you want to get files from |
+| **downloadPath** | Path where downloaded file will be stored |
 
 Example:
 
 ```json
 {
-    "download_template_name": "aws_bucket",
-    "download_version_name": "2.1.5",
-    "download_path": "./AwsBucket.zip"
+    "downloadTemplateName": "aws_bucket",
+    "downloadVersionName": "2.1.5",
+    "downloadPath": "./AwsBucket.zip"
 }
 ```
 ![alt text](./images/download_config.png "Download config action")
