@@ -8,7 +8,7 @@ const axiosCookieJarSupport = require('axios-cookiejar-support').default;
 
 axiosCookieJarSupport(axios);
 
-export let REST_API_ENDPOINT = 'https://template-library-radon.xlab.si/api';
+export let REST_API_ENDPOINT = 'https://template-library-xopera.xlab.si/api';
 
 interface RequestHeaders {
     [key: string]: any
