@@ -6,6 +6,7 @@ import { configAction } from './config-actions';
 import { setApiEndpointAction } from './set-api-endpoint-action';
 import { uploadTemplateInteractiveAction } from './upload-template-interactive-action';
 import { downloadTemplateInteractiveAction } from './download-template-interactive-action';
+import { lstatSync } from 'fs';
 
 export let CURRENTLY_SELECTED_FILE: string;
 export let CURRENT_DIR_PATH: string;
@@ -40,7 +41,8 @@ export async function activate(context: ExtensionContext) {
 			CURRENT_DIR_PATH = '';
 			window.showInformationMessage(`Selected file is: ${uri.fsPath}`);
 			let fileExtension = uri.fsPath.split('.').pop();
-			if (['csar', 'zip', 'tar', 'rar', 'gz', 'tgz', 'yml', 'yaml', 'tosca'].includes(fileExtension!!)) {
+			let isDir = lstatSync(uri.fsPath).isDirectory();
+			if (['csar', 'zip', 'tar', 'rar', 'gz', 'tgz', 'yml', 'yaml', 'tosca'].includes(fileExtension!!) || isDir) {
 				CURRENTLY_SELECTED_FILE = uri.fsPath;
 				window.showInformationMessage(`Selected file will be included in the process.`);
 			} else {

@@ -2,7 +2,9 @@ import { OpenDialogOptions, window, QuickInputButton, ExtensionContext, ThemeIco
 
 import * as restApi from './rest-api-calls';
 import { MultiStepInput } from './helpers';
-import { CURRENTLY_SELECTED_FILE } from './extension';
+import { CURRENTLY_SELECTED_FILE, CURRENT_DIR_PATH } from './extension';
+import { lstatSync } from 'fs';
+var zipdir = require('zip-local');
 
 export async function uploadTemplateInteractiveAction(context: ExtensionContext) {
 
@@ -219,7 +221,7 @@ export async function uploadTemplateInteractiveAction(context: ExtensionContext)
         } else {
             const options: OpenDialogOptions = {
                 title: createTemplateVersionTitle,
-                defaultUri: Uri.file("/projects"),
+                defaultUri: Uri.file(CURRENT_DIR_PATH) ? Uri.file(CURRENT_DIR_PATH) : Uri.file("/projects"),
                 canSelectMany: false,
                 canSelectFolders: false,
                 canSelectFiles: true,
@@ -266,25 +268,40 @@ export async function uploadTemplateInteractiveAction(context: ExtensionContext)
         }
 
         if (pickTemplateFileOptions.length === 2 && pick === pickTemplateFileOptions[0]) {
-            state.templateFile = CURRENTLY_SELECTED_FILE;
+            if (lstatSync(CURRENTLY_SELECTED_FILE).isDirectory()) {
+                var buff = zipdir.sync.zip(CURRENTLY_SELECTED_FILE).memory();
+                zipdir.sync.zip(CURRENTLY_SELECTED_FILE).compress().save(CURRENTLY_SELECTED_FILE + '.zip');
+                console.log('Selected template file: ' + CURRENTLY_SELECTED_FILE + '.zip');
+                state.templateFile = CURRENTLY_SELECTED_FILE + '.zip';
+            } else {
+                state.templateFile = CURRENTLY_SELECTED_FILE;
+            }
         } else {
             const options: OpenDialogOptions = {
                 title: createTemplateVersionTitle,
-                defaultUri: Uri.file("/projects"),
+                defaultUri: Uri.file(CURRENT_DIR_PATH) ? Uri.file(CURRENT_DIR_PATH) : Uri.file("/projects"),
                 canSelectMany: false,
-                canSelectFolders: false,
+                canSelectFolders: true,
                 canSelectFiles: true,
                 openLabel: 'Open',
                 filters: {
                     'CSAR': ['csar', 'zip', 'tar', 'rar', 'gz', 'tgz'],
-                    'TOSCA template files': ['yml', 'yaml', 'tosca']
+                    'TOSCA template files': ['yml', 'yaml', 'tosca'],
+                    'Directory': ['*'],
                 }
             };
 
             await window.showOpenDialog(options).then(fileUri => {
                 if (fileUri && fileUri[0]) {
-                    console.log('Selected template file: ' + fileUri[0].fsPath);
-                    state.templateFile = fileUri[0].fsPath;
+                    if (lstatSync(fileUri[0].fsPath).isDirectory()) {
+                        var buff = zipdir.sync.zip(fileUri[0].fsPath).memory();
+                        zipdir.sync.zip(fileUri[0].fsPath).compress().save(fileUri[0].fsPath + '.zip');
+                        console.log('Selected template file: ' + fileUri[0].fsPath + '.zip');
+                        state.templateFile = fileUri[0].fsPath + '.zip';
+                    } else {
+                        console.log('Selected template file: ' + fileUri[0].fsPath);
+                        state.templateFile = fileUri[0].fsPath;
+                    }
                 }
             });
         }
