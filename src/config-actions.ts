@@ -5,6 +5,8 @@ import * as fs from 'fs';
 import * as restApi from './rest-api-calls';
 import { MultiStepInput } from './helpers';
 import { CURRENTLY_SELECTED_FILE, CURRENT_DIR_PATH } from './extension';
+import { lstatSync } from "fs";
+var zipdir = require('zip-local');
 
 export async function configAction(context: ExtensionContext) {
 
@@ -103,7 +105,7 @@ export async function configAction(context: ExtensionContext) {
                 if (validateTemplate[0]) {
                     await intitateCreateTemplateRequest(uploadState);
                 } else {
-                    if (validateTemplate[1].length !== 0 && validateTemplate[2].length !== 0) {
+                    if (!validateVersion[0] && validateTemplate[1].length !== 0 && validateTemplate[2].length !== 0) {
                         window.showErrorMessage(`JSON config file create template action has missing keys: ${validateTemplate[2]}.`);
                     }
                 }
@@ -247,6 +249,14 @@ export async function configAction(context: ExtensionContext) {
         try {
             let returnValue = true;
 
+            if ("uploadTemplateName" in jsonConfig) {
+                presentKeys.push("uploadTemplateName");
+                uploadState.templateName = jsonConfig["uploadTemplateName"];
+            } else {
+                absentKeys.push("uploadTemplateName");
+                returnValue = false;
+            }
+
             if ("uploadVersionName" in jsonConfig) {
                 presentKeys.push("uploadVersionName");
                 uploadState.versionName = jsonConfig["uploadVersionName"];
@@ -270,8 +280,14 @@ export async function configAction(context: ExtensionContext) {
 
             if ("uploadTemplateFile" in jsonConfig) {
                 presentKeys.push("uploadTemplateFile");
+                // Add check if template file is dir and zip it to file
                 let templateFilePath = join(CURRENT_DIR_PATH, jsonConfig["uploadTemplateFile"]);
-                if (fileExists(templateFilePath)) {
+
+                if (lstatSync(templateFilePath).isDirectory()) {
+                    var buff = zipdir.sync.zip(templateFilePath).memory();
+                    zipdir.sync.zip(templateFilePath).compress().save(templateFilePath + '.zip');
+                    uploadState.templateFile = templateFilePath + '.zip';
+                } else if (fileExists(templateFilePath)) {
                     uploadState.templateFile = templateFilePath;
                 } else {
                     window.showErrorMessage(`File path '${templateFilePath}' from key 'uploadTemplateFile' does not exist.`);

@@ -142,7 +142,7 @@ When uploading a template version you can use the following keys (`uploadReadmeF
 |:-----------------|:-----------------|
 | **uploadVersionName** | Semantic version name |
 | **uploadReadmeFile** | Optional path to README file to upload |
-| **uploadTemplateFile** | TOSCA YAML service template file or compressed TOSCA Cloud Service Archive (CSAR) |
+| **uploadTemplateFile** | TOSCA YAML service template file, compressed TOSCA Cloud Service Archive (CSAR) or directory to be compressed |
 
 Example:
 

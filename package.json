@@ -3,7 +3,7 @@
 	"displayName": "template-library-plugin",
 	"description": "This is a VS Code/RADON IDE extension for Template library publishing service.",
 	"publisher": "radon",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"engines": {
 		"vscode": "^1.49.0"
 	},
