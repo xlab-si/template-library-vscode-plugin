@@ -1,13 +1,59 @@
 {
-	"name": "template-library-plugin",
-	"displayName": "template-library-plugin",
-	"description": "This is a VS Code/RADON IDE extension for Template library publishing service.",
-	"publisher": "radon",
-	"version": "0.0.6",
+	"name": "template-library",
+	"displayName": "Template Library",
+	"description": "Template Library VS Code/Eclipse Che Theia extension",
+	"publisher": "xlab",
+	"author": "XLAB",
+	"version": "0.0.7",
+	"license": "Apache-2.0",
+	"homepage": "https://template-library-xopera.xlab.si/docs/plugin.html",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/xlab-si/radon-template-library-publishing-service-plugin"
+	},
+	"bugs": {
+		"url": "https://github.com/xlab-si/radon-template-library-publishing-service-plugin/issues",
+		"email": "xopera@xlab.si"
+	  },
 	"engines": {
 		"vscode": "^1.49.0"
 	},
+	"extensionKind": [
+		"workspace",
+		"ui"
+	],
+	"keywords": [
+		"template",
+		"library",
+		"publishing",
+		"service",
+		"TPS",
+		"storage",
+		"orchestration",
+		"automation",
+		"OASIS",
+		"TOSCA",
+		"opera",
+		"xOpera",
+		"Ansible",
+		"YAML",
+		"YML",
+		"module",
+		"artifact",
+		"blueprint",
+		"application",
+		"CSAR",
+		"version",
+		"users",
+		"groups",
+		"RADON",
+		"FaaS",
+		"serverless",
+		"XLAB"
+	],
 	"categories": [
+		"Extension Packs",
+		"SCM Providers",
 		"Other"
 	],
 	"activationEvents": [
