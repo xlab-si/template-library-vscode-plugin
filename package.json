@@ -4,15 +4,15 @@
 	"description": "Template Library VS Code/Eclipse Che Theia extension",
 	"publisher": "xlab",
 	"author": "XLAB",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"license": "Apache-2.0",
 	"homepage": "https://template-library-xopera.xlab.si/docs/plugin.html",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/xlab-si/radon-template-library-publishing-service-plugin"
+		"url": "https://github.com/xlab-si/template-library-vscode-plugin"
 	},
 	"bugs": {
-		"url": "https://github.com/xlab-si/radon-template-library-publishing-service-plugin/issues",
+		"url": "https://github.com/xlab-si/template-library-vscode-plugin/issues",
 		"email": "xopera@xlab.si"
 	  },
 	"engines": {
