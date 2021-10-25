@@ -4,8 +4,9 @@
 	"description": "Template Library VS Code/Eclipse Che Theia extension",
 	"publisher": "xlab",
 	"author": "XLAB",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"license": "Apache-2.0",
+	"icon": "images/tps_logo.png",
 	"homepage": "https://template-library-xopera.xlab.si/docs/plugin.html",
 	"repository": {
 		"type": "git",
